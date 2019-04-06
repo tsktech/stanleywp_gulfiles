@@ -13,6 +13,9 @@ const include 		= require( 'gulp-include' );
 const plumber 		= require( 'gulp-plumber' );
 const autoprefixer 	= require( 'gulp-autoprefixer' );
 const sass 			= require( 'gulp-sass');
+const critical 		= require('critical');
+const imageoptim 	= require('gulp-imageoptim');
+
 
 var browserSync = require('browser-sync').create();
 // automatically reloads the page when files changed
@@ -136,6 +139,40 @@ function scss_min() {
         .pipe(browserSync.reload({stream: true}))
         .pipe(notify({ title: 'Sass', message: 'sass-min task complete' }));
 }
+
+
+// Optimize Images
+task('images', function() {
+    return src('./images/**/*')
+        .pipe(imageoptim.optimize({jpegmini: true}))
+        .pipe(dest('./images'))
+        .pipe( notify({ message: 'Images task complete' }));
+});
+
+// Generate & Inline Critical-path CSS
+function criticalTask (done) {
+    critical.generate({
+        base: './',
+        src: 'http://localhost:8888/wordpress/',
+        dest: 'css/home.min.css',
+        ignore: ['@font-face'],
+        dimensions: [{
+          width: 320,
+          height: 480
+        },{
+          width: 768,
+          height: 1024
+        },{
+          width: 1280,
+          height: 960
+        }],
+        minify: true
+    });
+    done();
+}
+
+task('critical', criticalTask );
+
 
 // Sass-min - Release build minifies CSS after compiling Sass
 task('sass-min', scss_min);
