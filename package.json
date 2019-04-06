@@ -1,0 +1,30 @@
+{
+  "name": "stanelywp4",
+  "version": "1.0.0",
+  "description": "BootStrap 4 WP Theme",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tsktech/stanleywp.git"
+  },
+  "keywords": [
+    "BootStrap",
+    "4",
+    "WP",
+    "Themes"
+  ],
+  "author": "srikanth@tskamath.com",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tsktech/stanleywp/issues"
+  },
+  "homepage": "https://github.com/tsktech/stanleywp#readme",
+  "devDependencies": {
+    "braces": "^2.3.2",
+    "browser-sync": "^2.26.3",
+    "gulp": "^4.0.0"
+  }
+}
