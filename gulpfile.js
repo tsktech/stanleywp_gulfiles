@@ -1,8 +1,13 @@
 // Load all the modules from package.json
-var gulp = require('gulp'),
-	browserSync = require('browser-sync').create();
+// var gulp = require('gulp'),
+//	
+
+const { task, src, dest, series, parallel, watch } = require('gulp');
+const zip = require('gulp-zip');
 
 
+var browserSync = require('browser-sync').create();
+ 
 // automatically reloads the page when files changed
 var browserSyncWatchFiles = [
     './*.min.css',
@@ -14,7 +19,13 @@ var browserSyncWatchFiles = [
 var browserSyncOptions = {
     watchTask: true,
     proxy: "http://localhost:8888/wordpress/",
-    browser: ["google chrome", "firefox"]
+    browser: "google chrome"
+}
+// browser: ["google chrome", "firefox"]
+
+//https://www.youtube.com/watch?v=2HpNiyimo8E
+function watch_files () {
+	gulp.watch([ './js/**/*.js', '!./js/dist/*.js' ], )
 }
 
 // Default error handler
@@ -23,24 +34,45 @@ var onError = function( err ) {
   this.emit('end');
 }
 
+function buildzip() {
+	return src([
+		'*',
+		'./css/*',
+		'./fonts/*',
+		'./images/**/*',
+		'./inc/**/*',
+		'./js/**/*',
+		'./languages/*',
+		'./sass/**/*',
+		'./template-parts/*',
+		'./templates/*',
+		'!bower_components',
+		'!node_modules',
+		], {base: "."})
+	.pipe(zip('stanelywp.zip'))
+	.pipe(dest('.'));
+}
+
+// Zip files up
+task('buildzip', buildzip);
 
 // Starts browser-sync task for starting the server.
-gulp.task('browser-sync', function() {
+task('browser-sync', function() {
     browserSync.init(browserSyncWatchFiles, browserSyncOptions);
 });
 
-// Start the livereload server and watch files for change
-gulp.task( 'watch', function() {
- 
-  // don't listen to whole js folder, it'll create an infinite loop
-  gulp.watch( [ './js/**/*.js', '!./js/dist/*.js' ], [ 'scripts' ] )
- 
-  gulp.watch( './sass/**/*.scss', ['sass', 'sass-min'] );
 
-  gulp.watch( './images/**/*', ['images']);
- 
-  //gulp.watch( './**/*.php' ).on('change', browserSync.reload);
-   
-} );
+
+
+//watcher.on('all', function() {
+  // console.log('File ' + path + ' was ' + event + ', running tasks...');
+//});
+
+task('default', series(parallel('browser-sync'), function() {
+     // Does nothing in this task, just triggers the dependent 'watch'
+}));
+
+
+
 
 

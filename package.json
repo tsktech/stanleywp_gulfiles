@@ -25,6 +25,7 @@
   "devDependencies": {
     "braces": "^2.3.2",
     "browser-sync": "^2.26.3",
-    "gulp": "^4.0.0"
+    "gulp": "^4.0.0",
+    "gulp-zip": "^4.2.0"
   }
 }
