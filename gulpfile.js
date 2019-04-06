@@ -4,17 +4,17 @@
 
 const { task, src, dest, series, parallel, watch } = require('gulp');
 const zip = require('gulp-zip');
+const jshint = require( 'gulp-jshint' );
+const stylish = require('jshint-stylish');
 
 
 var browserSync = require('browser-sync').create();
- 
 // automatically reloads the page when files changed
 var browserSyncWatchFiles = [
     './*.min.css',
     './js/**/*.min.js',
     './**/*.php'
 ];
-
 // see: https://www.browsersync.io/docs/options/
 var browserSyncOptions = {
     watchTask: true,
@@ -48,20 +48,33 @@ function buildzip() {
 		'./templates/*',
 		'!bower_components',
 		'!node_modules',
+		'!.g*',
+		'!gulp*',
+		'!package*',
+		'!stanleywp.zip',
 		], {base: "."})
-	.pipe(zip('stanelywp.zip'))
-	.pipe(dest('.'));
+	.pipe(zip('stanleywp.zip'))
+	.pipe(dest('./outputZip'));
 }
 
-// Zip files up
+function jshintIssues(){
+	return src( './js/src/*.js' )
+	.pipe( jshint() )
+	.pipe( jshint.reporter( stylish ) )
+	.pipe( jshint.reporter( 'fail' ) );
+}
+
+// Jshint outputs any kind of javascript problems you might have
+// Only checks javascript files inside /src directory
+task( 'jshint', jshintIssues);
+
+// Zip files up for Distribution
 task('buildzip', buildzip);
 
 // Starts browser-sync task for starting the server.
 task('browser-sync', function() {
     browserSync.init(browserSyncWatchFiles, browserSyncOptions);
 });
-
-
 
 
 //watcher.on('all', function() {

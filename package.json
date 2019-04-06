@@ -1,5 +1,5 @@
 {
-  "name": "stanelywp4",
+  "name": "stanleywp4",
   "version": "1.0.0",
   "description": "BootStrap 4 WP Theme",
   "main": "gulpfile.js",
@@ -26,6 +26,9 @@
     "braces": "^2.3.2",
     "browser-sync": "^2.26.3",
     "gulp": "^4.0.0",
-    "gulp-zip": "^4.2.0"
+    "gulp-jshint": "^2.1.0",
+    "gulp-zip": "^4.2.0",
+    "jshint": "^2.10.2",
+    "jshint-stylish": "^2.2.1"
   }
 }
