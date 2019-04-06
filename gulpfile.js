@@ -6,7 +6,10 @@ const { task, src, dest, series, parallel, watch } = require('gulp');
 const zip = require('gulp-zip');
 const jshint = require( 'gulp-jshint' );
 const stylish = require('jshint-stylish');
-
+const uglify = require( 'gulp-uglify' );
+const rename = require( 'gulp-rename' );
+const notify = require( 'gulp-notify' );
+const include = require( 'gulp-include' );
 
 var browserSync = require('browser-sync').create();
 // automatically reloads the page when files changed
@@ -63,6 +66,26 @@ function jshintIssues(){
 	.pipe( jshint.reporter( stylish ) )
 	.pipe( jshint.reporter( 'fail' ) );
 }
+
+function scripts() {
+  return src( './js/manifest.js' )
+    .pipe( include() )
+    .pipe( rename( { basename: 'scripts' } ) )
+    .pipe( dest( './js/dist' ) )
+    // Normal done, time to create the minified javascript (scripts.min.js)
+    // remove the following 3 lines if you don't want it
+    .pipe( uglify() )
+    .pipe( rename( { suffix: '.min' } ) )
+    .pipe( dest( './js/dist' ) )
+    .pipe(browserSync.reload({stream: true}))
+    .pipe( notify({ message: 'scripts task complete' }));
+}
+
+
+// Concatenates all files that it finds in the manifest
+// and creates two versions: normal and minified.
+// It's dependent on the jshint task to succeed.
+task( 'scripts', scripts );
 
 // Jshint outputs any kind of javascript problems you might have
 // Only checks javascript files inside /src directory
