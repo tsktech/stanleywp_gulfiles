@@ -15,6 +15,7 @@ const autoprefixer 	= require( 'gulp-autoprefixer' );
 const sass 			= require( 'gulp-sass');
 const critical 		= require('critical');
 const imageoptim 	= require('gulp-imageoptim');
+// const mageAlpha     = require('gulp-imagealpha');
 
 
 var browserSync = require('browser-sync').create();
@@ -142,12 +143,45 @@ function scss_min() {
 
 
 // Optimize Images
-task('images', function() {
+function images() {
     return src('./images/**/*')
-        .pipe(imageoptim.optimize({jpegmini: true}))
-        .pipe(dest('./images'))
+        .pipe(imageoptim.optimize())
+        .pipe(dest('./imagesopt/'))
         .pipe( notify({ message: 'Images task complete' }));
-});
+}
+//      .pipe(imageoptim.optimize({jpegmini: true}))
+// jpegmini is paid version
+// 
+// var imagemin = require( 'gulp-imagemin' );
+
+
+/**
+ * Task: `imgopt`.
+ *
+ * Minifies PNG, JPEG, GIF and SVG images.
+ *
+ * This task does the following:
+ *     1. Gets the source of images raw folder
+ *     2. Minifies PNG, JPEG, GIF and SVG images
+ *     3. Generates and saves the optimized images
+ *
+ * This task will run only once, if you want to run it
+ * again, do it with the command `gulp imgopt`.
+ */
+ 
+// gulp.task( 'imgopt', function() {
+// 	gulp.src( imagesSRC )
+// 		.pipe( imagemin({
+// 			progressive: true,
+// 			optimizationLevel: 3, // 0-7 low-high
+// 			interlaced: true,
+// 			svgoPlugins: [{removeViewBox: false}]
+// 		}))
+// 		.pipe( gulp.dest( imagesDestination ) )
+// 		.pipe( notify( { message: 'DONE: Images Optimized! 💯', onLast: true } ) );
+// } );
+
+
 
 // Generate & Inline Critical-path CSS
 function criticalTask (done) {
@@ -172,7 +206,7 @@ function criticalTask (done) {
 }
 
 task('critical', criticalTask );
-
+task ('images', images);
 
 // Sass-min - Release build minifies CSS after compiling Sass
 task('sass-min', scss_min);
