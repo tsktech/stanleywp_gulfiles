@@ -13,7 +13,8 @@ var browserSyncWatchFiles = [
 // see: https://www.browsersync.io/docs/options/
 var browserSyncOptions = {
     watchTask: true,
-    proxy: "http://localhost:8888/wordpress/"
+    proxy: "http://localhost:8888/wordpress/",
+    browser: ["google chrome", "firefox"]
 }
 
 // Default error handler
@@ -27,3 +28,19 @@ var onError = function( err ) {
 gulp.task('browser-sync', function() {
     browserSync.init(browserSyncWatchFiles, browserSyncOptions);
 });
+
+// Start the livereload server and watch files for change
+gulp.task( 'watch', function() {
+ 
+  // don't listen to whole js folder, it'll create an infinite loop
+  gulp.watch( [ './js/**/*.js', '!./js/dist/*.js' ], [ 'scripts' ] )
+ 
+  gulp.watch( './sass/**/*.scss', ['sass', 'sass-min'] );
+
+  gulp.watch( './images/**/*', ['images']);
+ 
+  //gulp.watch( './**/*.php' ).on('change', browserSync.reload);
+   
+} );
+
+
