@@ -3,13 +3,16 @@
 //	
 
 const { task, src, dest, series, parallel, watch } = require('gulp');
-const zip = require('gulp-zip');
-const jshint = require( 'gulp-jshint' );
-const stylish = require('jshint-stylish');
-const uglify = require( 'gulp-uglify' );
-const rename = require( 'gulp-rename' );
-const notify = require( 'gulp-notify' );
-const include = require( 'gulp-include' );
+const zip 			= require('gulp-zip');
+const jshint 		= require( 'gulp-jshint' );
+const stylish 		= require('jshint-stylish');
+const uglify 		= require( 'gulp-uglify' );
+const rename 		= require( 'gulp-rename' );
+const notify 		= require( 'gulp-notify' );
+const include 		= require( 'gulp-include' );
+const plumber 		= require( 'gulp-plumber' );
+const autoprefixer 	= require( 'gulp-autoprefixer' );
+const sass 			= require( 'gulp-sass');
 
 var browserSync = require('browser-sync').create();
 // automatically reloads the page when files changed
@@ -25,6 +28,10 @@ var browserSyncOptions = {
     browser: "google chrome"
 }
 // browser: ["google chrome", "firefox"]
+
+var config = {
+     nodeDir: './node_modules' 
+}
 
 //https://www.youtube.com/watch?v=2HpNiyimo8E
 function watch_files () {
@@ -80,6 +87,61 @@ function scripts() {
     .pipe(browserSync.reload({stream: true}))
     .pipe( notify({ message: 'scripts task complete' }));
 }
+
+
+// Different options for the Sass tasks
+var options = {};
+options.sass = {
+  errLogToConsole: true,
+  precision: 8,
+  noCache: true,
+  //imagePath: 'assets/img',
+  includePaths: [
+    config.nodeDir + '/bootstrap/scss',
+  ]
+};
+
+options.sassmin = {
+  errLogToConsole: true,
+  precision: 8,
+  noCache: true,
+  outputStyle: 'compressed',
+  //imagePath: 'assets/img',
+  includePaths: [
+    config.nodeDir + '/bootstrap/scss',
+  ]
+};
+
+
+// Sass
+function scss() {
+    return src('./sass/style.scss')
+        .pipe(plumber())
+        .pipe(sass(options.sass).on('error', sass.logError))
+        .pipe(autoprefixer())
+        .pipe(dest('.'))
+        .pipe(browserSync.reload({stream: true}))
+        .pipe(notify({ title: 'Sass', message: 'sass task complete'  }));
+}
+
+
+// Sass-min - Release build minifies CSS after compiling Sass
+function scss_min() {
+    return src('./sass/style.scss')
+        .pipe(plumber())
+        .pipe(sass(options.sassmin).on('error', sass.logError))
+        .pipe(autoprefixer())
+        .pipe(rename( { suffix: '.min' } ) )
+        .pipe(dest('.'))
+        .pipe(browserSync.reload({stream: true}))
+        .pipe(notify({ title: 'Sass', message: 'sass-min task complete' }));
+}
+
+// Sass-min - Release build minifies CSS after compiling Sass
+task('sass-min', scss_min);
+
+// sass
+task('sass', scss);
 
 
 // Concatenates all files that it finds in the manifest
