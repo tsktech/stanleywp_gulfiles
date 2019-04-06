@@ -1,6 +1,6 @@
 // Load all the modules from package.json
 // var gulp = require('gulp'),
-//	
+// https://www.sitepoint.com/fast-gulp-wordpress-theme-development-workflow/
 
 const { task, src, dest, series, parallel, watch } = require('gulp');
 const zip 			= require('gulp-zip');
@@ -16,9 +16,13 @@ const sass 			= require( 'gulp-sass');
 const critical 		= require('critical');
 const imageoptim 	= require('gulp-imageoptim');
 // const mageAlpha     = require('gulp-imagealpha');
+// gulp-changed, gulp-concat, gulp-imagemin, gulp-line-ending-corrector
+// gulp-sourcemaps
 
 
 var browserSync = require('browser-sync').create();
+var reload 		= browserSync.reload;
+
 // automatically reloads the page when files changed
 var browserSyncWatchFiles = [
     './*.min.css',
@@ -38,9 +42,9 @@ var config = {
 }
 
 //https://www.youtube.com/watch?v=2HpNiyimo8E
-function watch_files () {
-	gulp.watch([ './js/**/*.js', '!./js/dist/*.js' ], )
-}
+// function watch_files () {
+// 	gulp.watch([ './js/**/*.js', '!./js/dist/*.js' ], )
+// }
 
 // Default error handler
 var onError = function( err ) {
@@ -151,10 +155,12 @@ function images() {
 }
 //      .pipe(imageoptim.optimize({jpegmini: true}))
 // jpegmini is paid version
+// https://jonathanmh.com/tag/gulp/
+// https://diezjietal.be/blog/2015/02/18/image-optimizers.html
+// https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/automating-image-optimization/
+
 // 
 // var imagemin = require( 'gulp-imagemin' );
-
-
 /**
  * Task: `imgopt`.
  *
@@ -168,7 +174,7 @@ function images() {
  * This task will run only once, if you want to run it
  * again, do it with the command `gulp imgopt`.
  */
- 
+
 // gulp.task( 'imgopt', function() {
 // 	gulp.src( imagesSRC )
 // 		.pipe( imagemin({
@@ -228,18 +234,45 @@ task( 'jshint', jshintIssues);
 task('buildzip', buildzip);
 
 // Starts browser-sync task for starting the server.
-task('browser-sync', function() {
-    browserSync.init(browserSyncWatchFiles, browserSyncOptions);
-});
+// task('browser-sync', function() {
+//     browserSync.init(browserSyncWatchFiles, browserSyncOptions);
+// });
 
+function browser_sync (done) {
+	browserSync.init(browserSyncWatchFiles, browserSyncOptions);
+	// browserSync.init({
+	// 	server: {
+	// 		baseDir: './'
+	// 	}
+	// });
+	done();
+}
+
+task('bSync', browser_sync);
 
 //watcher.on('all', function() {
   // console.log('File ' + path + ' was ' + event + ', running tasks...');
 //});
 
-task('default', series(parallel('browser-sync'), function() {
+var imagessrc 	= './images/**/*';
+var csswatch 	= './sass/**/*.scss';
+var jssrc 		= [ './js/**/*.js', '!./js/dist/*.js' ];
+
+// watch for file changes
+function watch_files () {
+	watch(csswatch, scss);
+	watch(imagessrc, images);
+	watch(jssrc, series(scripts, reload));
+	src('./style.css')
+		.pipe( notify({ message: 'Gulp is watching Files, Happy Coding'}) );
+}
+
+
+// task('default', series(parallel( 'watch', 'browser-sync' ), function() {
      // Does nothing in this task, just triggers the dependent 'watch'
-}));
+// }));
+
+task('watch', series(watch_files, browser_sync));
 
 
 
